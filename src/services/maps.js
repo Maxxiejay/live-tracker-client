@@ -126,7 +126,7 @@ export const watchLocation = (callback, errorCallback, options = {}) => {
   
   // Configuration for jitter reduction
   const config = {
-    maxAccuracy: 30, // Only accept readings with accuracy <= 30m
+    maxAccuracy: 100, // Increased from 30m to 100m for more realistic GPS conditions
     minDistance: 15, // Ignore movements < 15m 
     throttleInterval: 5000, // Throttle updates to 5 seconds
     ...options
@@ -139,7 +139,10 @@ export const watchLocation = (callback, errorCallback, options = {}) => {
       
       // Filter 1: Check accuracy - only use good readings
       if (coords.accuracy > config.maxAccuracy) {
-        console.log(`Ignoring inaccurate reading: ${coords.accuracy}m > ${config.maxAccuracy}m`)
+        if (coords.accuracy > config.maxAccuracy * 2) {
+          // Only log if accuracy is really bad (> 2x threshold)
+          console.log(`Ignoring very inaccurate reading: ${coords.accuracy}m > ${config.maxAccuracy}m`)
+        }
         return
       }
       

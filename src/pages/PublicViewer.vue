@@ -546,8 +546,8 @@ const startWatchingUserLocation = () => {
       alert(`Location error: ${error.message}`)
     },
     {
-      maxAccuracy: 50, // More lenient for viewers since it's just for reference
-      minDistance: 20, // Larger minimum distance for viewers
+      maxAccuracy: 200, // More lenient for viewers
+      minDistance: 30, // Larger minimum distance for viewers with poor GPS
       throttleInterval: 8000 // Less frequent updates for viewers (8 seconds)
     }
   )

@@ -202,8 +202,8 @@ const startSharing = async () => {
         }
       },
       {
-        maxAccuracy: 30, // Only accept readings with accuracy <= 30m
-        minDistance: 15, // Ignore movements < 15m 
+        maxAccuracy: 500, // Very lenient - accept readings up to 500m accuracy
+        minDistance: 25, // Slightly larger minimum distance for poor GPS
         throttleInterval: 5000 // Update every 5 seconds
       }
     )
