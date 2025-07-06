@@ -100,10 +100,10 @@
         <div class="p-6">
           <!-- Session Info -->
           <div class="mb-6">
-          <!-- Session Info -->
-          <div class="mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Session Details</h2>
-            <div class="space-y-3 text-sm"> session.notes }}</p>
+            <div class="space-y-3 text-sm">
+              <div v-if="session.notes" class="bg-gray-50 rounded-lg p-3">
+                <p class="text-gray-700">{{ session.notes }}</p>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Started:</span>
@@ -371,21 +371,16 @@ const startLocationUpdates = () => {
         
         isConnected.value = true
       } else {
-        console.log('No location data available:', result.error)
-        
-        isConnected.value = true
-      } else {
         // Don't treat this as a connection error if there's just no location yet
         isConnected.value = true
       }
+    } catch (error) {
+      isConnected.value = false
+      console.error('Failed to fetch location update:', error)
+    }
   }, 3000)
 }
 
-const updateMap = async (location) => {
-  try {
-    // Validate location data
-    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
-      console.error('Invalid location data for map:', location)
 const updateMap = async (location) => {
   try {
     // Validate location data
@@ -400,6 +395,11 @@ const updateMap = async (location) => {
     }
     
     if (!map.value && mapContainer.value) {
+      map.value = await createMap(mapContainer.value, {
+        center: { lat: location.lat, lng: location.lng },
+        zoom: 16
+      })
+    }
     
     if (map.value) {
       const newCenter = { lat: location.lat, lng: location.lng }
