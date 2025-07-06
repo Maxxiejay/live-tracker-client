@@ -223,3 +223,13 @@ This project is licensed under the MIT License.
 ## 📞 Support
 
 For questions or support, please contact the development team or create an issue in the repository.
+
+
+## Jittering Fix
+| Fix                          | Description                           |
+| ---------------------------- | ------------------------------------- |
+| ✅ Filter by `accuracy <= 30` | Only use good readings                |
+| ✅ Ignore movements `< 15m`   | Prevent jitter from false positives   |
+| ✅ Throttle updates (5–10s)   | Fewer GPS calls = more stable results |
+| ✅ Use `watchPosition()`      | Already using — good                  |
+| 🔁 Kalman Filter (optional)  | For smoother animation/path tracking  |

@@ -176,7 +176,7 @@ const startSharing = async () => {
       throw new Error('Geolocation is not supported by this browser')
     }
     
-    // Start watching location
+    // Start watching location with jitter reduction
     locationWatchId.value = watchLocation(
       (position) => {
         currentLocation.value = position
@@ -200,6 +200,11 @@ const startSharing = async () => {
         } else {
           error.value = `Location error: ${error.message}`
         }
+      },
+      {
+        maxAccuracy: 30, // Only accept readings with accuracy <= 30m
+        minDistance: 15, // Ignore movements < 15m 
+        throttleInterval: 5000 // Update every 5 seconds
       }
     )
   } catch (err) {
@@ -228,7 +233,7 @@ const updateLocationOnServer = debounce(async (position) => {
     accuracy: position.accuracy,
     timestamp: position.timestamp
   })
-}, 2000)
+}, 3000) // Increased from 2s to 3s since we're already filtering at watchLocation level
 
 const updateMap = async (position) => {
   try {

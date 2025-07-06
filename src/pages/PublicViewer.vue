@@ -91,8 +91,6 @@
             <Clock class="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 class="text-lg font-semibold text-gray-900 mb-2">Session Ended</h3>
             <p class="text-gray-600">This tracking session is no longer active.</p>
-            <!-- Debug info -->
-            <p class="text-xs text-gray-400 mt-2">Debug: Status = "{{ session?.status }}"</p>
           </div>
         </div>
       </div>
@@ -102,17 +100,10 @@
         <div class="p-6">
           <!-- Session Info -->
           <div class="mb-6">
+          <!-- Session Info -->
+          <div class="mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Session Details</h2>
-            <!-- Debug info -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-sm">
-              <p><strong>Debug Info:</strong></p>
-              <p>Status: "{{ session?.status }}"</p>
-              <p>Session object: {{ session ? 'exists' : 'null' }}</p>
-              <p>Loading: {{ loading }}</p>
-            </div>
-            <div class="space-y-3 text-sm">
-              <div v-if="session.notes" class="bg-gray-50 rounded-lg p-3">
-                <p class="text-gray-700">{{ session.notes }}</p>
+            <div class="space-y-3 text-sm"> session.notes }}</p>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Started:</span>
@@ -318,8 +309,6 @@ const loadSession = async () => {
   
   if (result.success) {
     session.value = result.session
-    console.log('Session loaded:', session.value)
-    console.log('Session status:', session.value?.status)
     
     // Start polling for updates if session is active
     if (session.value.status === 'active') {
@@ -349,13 +338,9 @@ const startLocationUpdates = () => {
   updateInterval.value = setInterval(async () => {
     try {
       const result = await sessionStore.getLatestLocation(code)
-      console.log('Location update result:', result)
       
       if (result.success && result.location) {
         const newLocation = result.location
-        console.log('New location data:', newLocation)
-        console.log('Latitude type:', typeof newLocation.latitude, 'Value:', newLocation.latitude)
-        console.log('Longitude type:', typeof newLocation.longitude, 'Value:', newLocation.longitude)
         
         if (!currentLocation.value || 
             newLocation.latitude !== currentLocation.value.lat || 
@@ -387,16 +372,20 @@ const startLocationUpdates = () => {
         isConnected.value = true
       } else {
         console.log('No location data available:', result.error)
+        
+        isConnected.value = true
+      } else {
         // Don't treat this as a connection error if there's just no location yet
         isConnected.value = true
       }
-    } catch (error) {
-      isConnected.value = false
-      console.error('Failed to fetch location update:', error)
-    }
   }, 3000)
 }
 
+const updateMap = async (location) => {
+  try {
+    // Validate location data
+    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+      console.error('Invalid location data for map:', location)
 const updateMap = async (location) => {
   try {
     // Validate location data
@@ -410,14 +399,7 @@ const updateMap = async (location) => {
       return
     }
     
-    console.log('Updating map with location:', location)
-    
     if (!map.value && mapContainer.value) {
-      map.value = await createMap(mapContainer.value, {
-        center: { lat: location.lat, lng: location.lng },
-        zoom: 16
-      })
-    }
     
     if (map.value) {
       const newCenter = { lat: location.lat, lng: location.lng }
@@ -562,6 +544,11 @@ const startWatchingUserLocation = () => {
       
       // You could show a toast notification here
       alert(`Location error: ${error.message}`)
+    },
+    {
+      maxAccuracy: 50, // More lenient for viewers since it's just for reference
+      minDistance: 20, // Larger minimum distance for viewers
+      throttleInterval: 8000 // Less frequent updates for viewers (8 seconds)
     }
   )
 }
